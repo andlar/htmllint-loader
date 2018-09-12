@@ -34,9 +34,9 @@ const matchReplace = match => {
     output = output.replace(/{{{.*?}}}/, randomKey('handlebars'));
   }
 
-  while (output.search(/{{.*?}}/) >= 0) {
-    output = output.replace(/{{.*?}}/, randomKey('handlebars'));
-  }
+//  while (output.search(/{{.*?}}/) >= 0) {
+//    output = output.replace(/{{.*?}}/, randomKey('handlebars'));
+//  }
 
   while (output.search(/<%=.*?%>/) >= 0) {
     output = output.replace(/<%=.*?%>/, randomKey('ejs'));
@@ -79,7 +79,7 @@ const cleanAttributes = content => {
 
         // every valid html attr that is not quoted
         const hbsRegex = new RegExp(`${attr}={{{.*?}}}`);
-        const hbsRegex2 = new RegExp(`${attr}={{.*?}}`);
+//        const hbsRegex2 = new RegExp(`${attr}={{.*?}}`);
         const ejsRegex = new RegExp(`${attr}=<%=.*?%>`);
         const ejsRegex2 = new RegExp(`${attr}=<%-.*?%>`);
         const ejsRegex3 = new RegExp(`${attr}=<%.*?%>`);
@@ -89,7 +89,7 @@ const cleanAttributes = content => {
 
         output = output.replace(regex, matchReplace);
         output = output.replace(hbsRegex, `${attr}=${randomKey('handlebars')}`);
-        output = output.replace(hbsRegex2, `${attr}=${randomKey('handlebars')}`);
+//        output = output.replace(hbsRegex2, `${attr}=${randomKey('handlebars')}`);
         output = output.replace(ejsRegex, `${attr}=${randomKey('ejs')}`);
         output = output.replace(ejsRegex2, `${attr}=${randomKey('ejs')}`);
         output = output.replace(ejsRegex3, `${attr}=${randomKey('ejs')}`);
@@ -112,9 +112,9 @@ const cleanHandlebars = content => {
   }
 
   // clean multiple intances of handlebars text in 1 line
-  while (output.search(/{{.*?}}/) >= 0) {
-    output = output.replace(/{{.*?}}/, '');
-  }
+//  while (output.search(/{{.*?}}/) >= 0) {
+//    output = output.replace(/{{.*?}}/, '');
+//  }
 
   return output;
 };
@@ -344,9 +344,9 @@ const lint = (source, options, webpack) => {
   }
 
   // fragmented handlebars
-  while (content.search(/{{[\s\S]*?}}/) >= 0) {
-    content = content.replace(/{{[\s\S]*?}}/, match => '\n'.repeat(match.split('\n').length - 1));
-  }
+//  while (content.search(/{{[\s\S]*?}}/) >= 0) {
+//    content = content.replace(/{{[\s\S]*?}}/, match => '\n'.repeat(match.split('\n').length - 1));
+//  }
 
   htmllint(content, options.lintOptions).then(issues => {
     for (const issue of issues) {
