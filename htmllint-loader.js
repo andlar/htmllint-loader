@@ -30,13 +30,15 @@ const randomKey = key => `${key}-${getRandomInt(1, 10000)}`;
 const matchReplace = match => {
   let output = match;
 
-  while (output.search(/{{{.*?}}}/) >= 0) {
-    output = output.replace(/{{{.*?}}}/, randomKey('handlebars'));
-  }
+  if (options.replaceHandlebars) {
+    while (output.search(/{{{.*?}}}/) >= 0) {
+      output = output.replace(/{{{.*?}}}/, randomKey('handlebars'));
+    }
 
-//  while (output.search(/{{.*?}}/) >= 0) {
-//    output = output.replace(/{{.*?}}/, randomKey('handlebars'));
-//  }
+    while (output.search(/{{.*?}}/) >= 0) {
+      output = output.replace(/{{.*?}}/, randomKey('handlebars'));
+    }
+  }
 
   while (output.search(/<%=.*?%>/) >= 0) {
     output = output.replace(/<%=.*?%>/, randomKey('ejs'));
@@ -78,8 +80,10 @@ const cleanAttributes = content => {
         const regex = new RegExp(`${attr}=".*?"`, 'g');
 
         // every valid html attr that is not quoted
-        const hbsRegex = new RegExp(`${attr}={{{.*?}}}`);
-//        const hbsRegex2 = new RegExp(`${attr}={{.*?}}`);
+        if (options.replaceHandlebars) {
+          const hbsRegex = new RegExp(`${attr}={{{.*?}}}`);
+          const hbsRegex2 = new RegExp(`${attr}={{.*?}}`);
+        }
         const ejsRegex = new RegExp(`${attr}=<%=.*?%>`);
         const ejsRegex2 = new RegExp(`${attr}=<%-.*?%>`);
         const ejsRegex3 = new RegExp(`${attr}=<%.*?%>`);
@@ -88,8 +92,10 @@ const cleanAttributes = content => {
         const phpRegex3 = new RegExp(`${attr}=<\\?.*?\\?>`);
 
         output = output.replace(regex, matchReplace);
-        output = output.replace(hbsRegex, `${attr}=${randomKey('handlebars')}`);
-//        output = output.replace(hbsRegex2, `${attr}=${randomKey('handlebars')}`);
+        if (options.replaceHandlebars) {
+          output = output.replace(hbsRegex, `${attr}=${randomKey('handlebars')}`);
+          output = output.replace(hbsRegex2, `${attr}=${randomKey('handlebars')}`);
+        }
         output = output.replace(ejsRegex, `${attr}=${randomKey('ejs')}`);
         output = output.replace(ejsRegex2, `${attr}=${randomKey('ejs')}`);
         output = output.replace(ejsRegex3, `${attr}=${randomKey('ejs')}`);
@@ -112,9 +118,9 @@ const cleanHandlebars = content => {
   }
 
   // clean multiple intances of handlebars text in 1 line
-//  while (output.search(/{{.*?}}/) >= 0) {
-//    output = output.replace(/{{.*?}}/, '');
-//  }
+  while (output.search(/{{.*?}}/) >= 0) {
+    output = output.replace(/{{.*?}}/, '');
+  }
 
   return output;
 };
@@ -184,7 +190,9 @@ const cleanContent = content => {
       line = '';
     } else {
       line = cleanAttributes(line);
-      line = cleanHandlebars(line);
+      if (options.replaceHandlebars) {
+        line = cleanHandlebars(line);
+      }
       line = cleanEjs(line);
       line = cleanPHP(line);
       line = line
@@ -338,15 +346,17 @@ const lint = (source, options, webpack) => {
 
   content = cleanContent(content);
 
-  // fragmented handlebars
-  while (content.search(/{{{[\s\S]*?}}}/) >= 0) {
-    content = content.replace(/{{{[\s\S]*?}}}/, match => '\n'.repeat(match.split('\n').length - 1));
-  }
+  if (options.replaceHandlebars) {
+    // fragmented handlebars
+    while (content.search(/{{{[\s\S]*?}}}/) >= 0) {
+      content = content.replace(/{{{[\s\S]*?}}}/, match => '\n'.repeat(match.split('\n').length - 1));
+    }
 
-  // fragmented handlebars
-//  while (content.search(/{{[\s\S]*?}}/) >= 0) {
-//    content = content.replace(/{{[\s\S]*?}}/, match => '\n'.repeat(match.split('\n').length - 1));
-//  }
+    // fragmented handlebars
+    while (content.search(/{{[\s\S]*?}}/) >= 0) {
+      content = content.replace(/{{[\s\S]*?}}/, match => '\n'.repeat(match.split('\n').length - 1));
+    }
+  }
 
   htmllint(content, options.lintOptions).then(issues => {
     for (const issue of issues) {
@@ -440,4 +450,3 @@ module.exports = function htmlLint(source) {
 
   return source;
 };
-

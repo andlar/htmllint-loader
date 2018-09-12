@@ -114,6 +114,7 @@ module.exports = {
           config: '.htmllintrc', // path to custom config file
           failOnError: false,
           failOnWarning: false,
+          replaceHandlebars: false, // true to replace instances of {{ }} and {{{ }}} with "handlebars-nnnn" or "", depending on context
         },
       },
     ]
