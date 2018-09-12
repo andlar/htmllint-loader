@@ -36,7 +36,7 @@
     "chalk": "^2.1.0",
     "deasync": "^0.1.10",
     "glob": "^7.1.2",
-    "htmllint": "^0.6.0",
+    "htmllint": "^0.7.2",
     "ignore": "^3.3.5",
     "strip-ansi": "^4.0.0",
     "text-table": "^0.2.0"
