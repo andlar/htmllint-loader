@@ -30,7 +30,7 @@ const randomKey = key => `${key}-${getRandomInt(1, 10000)}`;
 const matchReplace = match => {
   let output = match;
 
-  if (options.replaceHandlebars) {
+  if (false && options.replaceHandlebars) { // not sure how to pass "options" to this function yet
     while (output.search(/{{{.*?}}}/) >= 0) {
       output = output.replace(/{{{.*?}}}/, randomKey('handlebars'));
     }
@@ -67,7 +67,7 @@ const matchReplace = match => {
   return output;
 };
 
-const cleanAttributes = content => {
+const cleanAttributes = (content, options) => {
   let output = content;
 
   for (const key in htmlAttributes) {
@@ -167,7 +167,7 @@ const cleanPHP = content => {
   return output;
 };
 
-const cleanContent = content => {
+const cleanContent = (content, options) => {
   const lines = content.split('\n');
   let disabled = false;
 
@@ -189,7 +189,7 @@ const cleanContent = content => {
     if (disabled) {
       line = '';
     } else {
-      line = cleanAttributes(line);
+      line = cleanAttributes(line, options);
       if (options.replaceHandlebars) {
         line = cleanHandlebars(line);
       }
@@ -344,7 +344,7 @@ const lint = (source, options, webpack) => {
     return parts.join('\n');
   });
 
-  content = cleanContent(content);
+  content = cleanContent(content, options);
 
   if (options.replaceHandlebars) {
     // fragmented handlebars
